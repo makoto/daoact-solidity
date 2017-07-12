@@ -3,24 +3,17 @@ const Tempo = require('@digix/tempo');
 const chai = require('chai');
 const { wait, waitUntilBlock } = require('@digix/tempo')(web3)
 assert = chai.assert;
+const state = {
+  'PreFunding':0, 'Funding':1, 'Closed':2
+}
 
 contract('ForecasterReward', function(accounts) {
-  let instance;
+  let instance, current_block;
   let owner_address = accounts[0];
-  let start_block   = 1;
-  let end_block     = 10;
+  let start_block   = 10;
+  let end_block     = 20;
   let forecaster_contract_address = accounts[1];
   let pre_ico_contract_address = accounts[2];
-
-  beforeEach(async function(){
-    instance = await ForecasterReward.new(
-      owner_address,
-      start_block,
-      end_block,
-      forecaster_contract_address,
-      pre_ico_contract_address
-    )
-  })
 
   describe('on construction', function(){
     it('correct params', async function(){
@@ -77,13 +70,35 @@ contract('ForecasterReward', function(accounts) {
       ).catch(function(){});
       assert.notExists(instance);
     })
-
   })
 
   describe('getState', function(){
-    it("returns 1 by default", async function() {
-      let r = await instance.getState()
-      console.log(r, 1);
+    beforeEach(async function(){
+      current_block = web3.eth.blockNumber;
+      start_block = current_block + 10;
+      end_block = start_block + 100;
+      instance = await ForecasterReward.new(
+        owner_address,
+        start_block,
+        end_block,
+        forecaster_contract_address,
+        pre_ico_contract_address
+      )
+    })
+
+    it("PreFunding by default", async function() {
+      assert.deepEqual((await instance.getState()).toNumber(), state['PreFunding']);
     });
+
+    it("Funding after start time has passed", async function() {
+      await waitUntilBlock(0, start_block + 2);
+      assert.deepEqual((await instance.getState()).toNumber(), state['Funding']);
+    });
+
+    it("Closed after end time has passed", async function() {
+      await waitUntilBlock(0, end_block + 2);
+      assert.deepEqual((await instance.getState()).toNumber(), state['Closed']);
+    });
+
   })
 });
