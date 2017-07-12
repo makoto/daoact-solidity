@@ -1,10 +1,4 @@
 
-# Audit requirements
-
-- The code must be open sourced prior to the start of the auditing so that we can publicly refer the specific commit number.
-- Some common sense must be implemented (ie: set max amount)
-- If critical error has been found, the Pre ICO has to be postponed.
-
 
 ## Test Todo
 
