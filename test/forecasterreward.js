@@ -8,7 +8,7 @@ const state = {
 }
 
 contract('ForecasterReward', function(accounts) {
-  let instance, current_block;
+  let instance, current_block, investment;
   let owner_address = accounts[0];
   let start_block   = 10;
   let end_block     = 20;
@@ -87,18 +87,19 @@ contract('ForecasterReward', function(accounts) {
     })
 
     it("PreFunding by default", async function() {
-      assert.deepEqual((await instance.getState()).toNumber(), state['PreFunding']);
+      assert.deepEqual((await instance.getState.call()).toNumber(), state['PreFunding']);
     });
 
     it("Funding after start time has passed", async function() {
       await waitUntilBlock(0, start_block + 2);
-      assert.deepEqual((await instance.getState()).toNumber(), state['Funding']);
+      assert.deepEqual((await instance.getState.call()).toNumber(), state['Funding']);
     });
 
     it("Closed after end time has passed", async function() {
       await waitUntilBlock(0, end_block + 2);
-      assert.deepEqual((await instance.getState()).toNumber(), state['Closed']);
+      assert.deepEqual((await instance.getState.call()).toNumber(), state['Closed']);
     });
 
   })
+
 });
