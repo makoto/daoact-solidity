@@ -36,3 +36,4 @@ contract Haltable is Ownable {
   }
 
 }
+
